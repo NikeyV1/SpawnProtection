@@ -1,0 +1,6 @@
+name: SpawnProtection
+version: '1.0'
+main: de.nikey.spawnProtection.SpawnProtection
+api-version: '1.21'
+authors: [Nikey]
+website: https://github.com/NikeyV1
