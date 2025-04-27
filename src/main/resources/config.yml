@@ -1,0 +1,12 @@
+protection:
+  default-minutes: 2
+  first-join-minutes: 2
+
+proximity-detection:
+  radius: 52
+  min-time-seconds: 120
+
+messages:
+  protection-ended: "&aYour spawn protection has ended."
+  protected-nearby: "&eYou are too close to players who could harm you!"
+  aggressor-nearby: "&cDo not chase spawn protected players!"
