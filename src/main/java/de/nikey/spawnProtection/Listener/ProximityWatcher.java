@@ -1,6 +1,8 @@
 package de.nikey.spawnProtection.Listener;
 
 import de.nikey.spawnProtection.Managers.ProtectionManager;
+import de.nikey.spawnProtection.SpawnProtection;
+import de.nikey.trust.Trust;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
@@ -46,6 +48,9 @@ public class ProximityWatcher {
                 for (Player other : nearbyPlayers) {
                     if (other.equals(protectedPlayer)) continue;
                     if (manager.isProtected(other)) continue;
+                    if (SpawnProtection.hasTrustEnabled) {
+                        if (Trust.isTrusted(protectedPlayer.getUniqueId(),other.getUniqueId()))continue;
+                    }
 
                     int seconds = nearbyMap.getOrDefault(other.getUniqueId(), 0) + 2;
                     nearbyMap.put(other.getUniqueId(), seconds);
@@ -71,6 +76,6 @@ public class ProximityWatcher {
                                 !nearbyPlayers.contains(Bukkit.getPlayer(uuid))
                 );
             }
-        }, 0L, 40L); // alle 2 Sekunden
+        }, 0L, 40L);
     }
 }

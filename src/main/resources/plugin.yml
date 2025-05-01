@@ -5,7 +5,5 @@ api-version: '1.21'
 authors: [ Nikey ]
 website: https://github.com/NikeyV1
 commands:
-  confirmattack:
-    description: Confirm attacking a protected player
-  endprotection:
-    description: End your spawn protection manually
+  spawnprotection:
+    description: Spawn Protection command
