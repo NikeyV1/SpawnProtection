@@ -2,6 +2,10 @@ protection:
   default-minutes: 2
   first-join-minutes: 2
 
+claim:
+  enabled: true
+  required-online-minutes: 15
+
 proximity-detection:
   radius: 52
   min-time-seconds: 120
