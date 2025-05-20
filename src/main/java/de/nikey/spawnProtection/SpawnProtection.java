@@ -5,6 +5,7 @@ import de.nikey.spawnProtection.Listener.ProtectionListener;
 import de.nikey.spawnProtection.Listener.ProximityWatcher;
 import de.nikey.spawnProtection.Managers.DailyProtectionManager;
 import de.nikey.spawnProtection.Managers.ProtectionManager;
+import de.nikey.spawnProtection.Managers.TodayPlaytimeManager;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -20,6 +21,7 @@ public final class SpawnProtection extends JavaPlugin {
     private static SpawnProtection plugin;
     private static ProtectionManager protectionManager;
     private static DailyProtectionManager dailyProtectionManager;
+    private static TodayPlaytimeManager todayPlaytimeManager;
 
     public static boolean hasTrustEnabled = false;
     public static boolean hasBuffSMPEnabled = false;
@@ -30,6 +32,7 @@ public final class SpawnProtection extends JavaPlugin {
         saveDefaultConfig();
         protectionManager = new ProtectionManager(this);
         dailyProtectionManager = new DailyProtectionManager(this);
+        todayPlaytimeManager = new TodayPlaytimeManager(this);
         getCommand("spawnprotection").setExecutor(new SpawnProtectionCommand());
         getCommand("spawnprotection").setTabCompleter(new SpawnProtectionCommand());
         new ProtectionListener(protectionManager);
@@ -89,6 +92,9 @@ public final class SpawnProtection extends JavaPlugin {
         file.delete();
     }
 
+    public static TodayPlaytimeManager getTodayPlaytimeManager() {
+        return todayPlaytimeManager;
+    }
 
     public static DailyProtectionManager getDailyProtectionManager() {
         return dailyProtectionManager;

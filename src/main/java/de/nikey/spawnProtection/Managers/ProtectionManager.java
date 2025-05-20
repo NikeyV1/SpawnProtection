@@ -2,8 +2,8 @@ package de.nikey.spawnProtection.Managers;
 
 import de.nikey.buffSMP.General.ShowCooldown;
 import de.nikey.spawnProtection.SpawnProtection;
+import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
@@ -24,6 +24,7 @@ public class ProtectionManager {
     private final Plugin plugin;
     public final Map<UUID, Integer> protectionTime = new HashMap<>();
     private final Map<UUID, BukkitTask> timers = new HashMap<>();
+    private final Map<UUID, BossBar> bossBars = new HashMap<>();
     private final int defaultProtectionMinutes;
     private final int firstJoinProtectionMinutes;
 
@@ -33,6 +34,7 @@ public class ProtectionManager {
         this.defaultProtectionMinutes = config.getInt("protection.default-minutes", 5);
         this.firstJoinProtectionMinutes = config.getInt("protection.first-join-minutes", 10);
     }
+
 
     public void startProtection(Player player, boolean firstJoin) {
         int sec = firstJoin ? firstJoinProtectionMinutes : defaultProtectionMinutes;
@@ -44,6 +46,24 @@ public class ProtectionManager {
         if (timers.containsKey(player.getUniqueId())) {
             timers.get(player.getUniqueId()).cancel();
         }
+        BossBar bar = bossBars.remove(player.getUniqueId());
+        if (bar != null) {
+            bar.removeViewer(player);
+        }
+
+        String displayMode = plugin.getConfig().getString("protection.protection-display", "actionbar");
+        if (displayMode.equalsIgnoreCase("bossbar")) {
+            BossBar bossBar = BossBar.bossBar(
+                    Component.text("Spawn Protection").color(NamedTextColor.AQUA),
+                    1.0f,
+                    BossBar.Color.BLUE,
+                    BossBar.Overlay.PROGRESS
+            );
+            player.showBossBar(bossBar);
+            bossBars.put(player.getUniqueId(), bossBar);
+        }
+
+        int totalSeconds = sec * 60;
 
         timers.put(player.getUniqueId(), new BukkitRunnable() {
             @Override
@@ -54,6 +74,12 @@ public class ProtectionManager {
                 if (timeLeft <= 0) {
                     protectionTime.remove(player.getUniqueId());
                     timers.remove(player.getUniqueId());
+
+                    BossBar bossBar = bossBars.remove(player.getUniqueId());
+                    if (bossBar != null) {
+                        player.hideBossBar(bossBar);
+                    }
+
                     player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 1.5f);
                     Component message = LegacyComponentSerializer.legacyAmpersand().deserialize(plugin.getConfig().getString("messages.protection-ended", "&aYour spawn protection has ended."));
                     player.sendActionBar(message);
@@ -61,12 +87,23 @@ public class ProtectionManager {
                     cancel();
                 } else {
                     protectionTime.put(player.getUniqueId(), timeLeft);
-                    if (SpawnProtection.hasBuffSMPEnabled) {
-                        if (!ShowCooldown.viewingPlayers.containsKey(player.getUniqueId())) {
-                            player.sendActionBar(Component.text(formatTime(timeLeft)).color(NamedTextColor.DARK_AQUA));
+
+                    String formatted = formatTime(timeLeft);
+
+                    if (displayMode.equalsIgnoreCase("bossbar")) {
+                        BossBar bossBar = bossBars.get(player.getUniqueId());
+                        if (bossBar != null) {
+                            bossBar.name(Component.text("Spawn Protection: " + formatted).color(NamedTextColor.AQUA));
+                            bossBar.progress((float) timeLeft / totalSeconds);
                         }
-                    }else {
-                        player.sendActionBar(Component.text(formatTime(timeLeft)).color(NamedTextColor.DARK_AQUA));
+                    } else {
+                        if (SpawnProtection.hasBuffSMPEnabled) {
+                            if (!ShowCooldown.viewingPlayers.containsKey(player.getUniqueId())) {
+                                player.sendActionBar(Component.text(formatted).color(NamedTextColor.DARK_AQUA));
+                            }
+                        } else {
+                            player.sendActionBar(Component.text(formatted).color(NamedTextColor.DARK_AQUA));
+                        }
                     }
                 }
             }
@@ -76,6 +113,7 @@ public class ProtectionManager {
     public boolean isProtected(Player player) {
         return protectionTime.containsKey(player.getUniqueId());
     }
+
     public boolean hasProtection(UUID player) {
         return protectionTime.containsKey(player);
     }
@@ -85,6 +123,10 @@ public class ProtectionManager {
         if (timers.containsKey(player.getUniqueId())) {
             timers.get(player.getUniqueId()).cancel();
             timers.remove(player.getUniqueId());
+        }
+        BossBar bar = bossBars.remove(player.getUniqueId());
+        if (bar != null) {
+            bar.removeViewer(player);
         }
         applyNameProtectionState(player, false);
     }
@@ -117,6 +159,23 @@ public class ProtectionManager {
         if (timers.containsKey(uuid)) {
             timers.get(uuid).cancel();
         }
+        BossBar bar = bossBars.remove(player.getUniqueId());
+        if (bar != null) {
+            bar.removeViewer(player);
+        }
+
+
+        String displayMode = plugin.getConfig().getString("protection.protection-display", "actionbar");
+        if (displayMode.equalsIgnoreCase("bossbar")) {
+            BossBar bossBar = BossBar.bossBar(
+                    Component.text("Spawn Protection").color(NamedTextColor.AQUA),
+                    1.0f,
+                    BossBar.Color.BLUE,
+                    BossBar.Overlay.PROGRESS
+            );
+            player.showBossBar(bossBar);
+            bossBars.put(player.getUniqueId(), bossBar);
+        }
 
         timers.put(uuid, new BukkitRunnable() {
             @Override
@@ -127,19 +186,32 @@ public class ProtectionManager {
                 if (timeLeft <= 0) {
                     protectionTime.remove(uuid);
                     timers.remove(uuid);
+                    BossBar bossBar = bossBars.remove(player.getUniqueId());
+                    if (bossBar != null) {
+                        player.hideBossBar(bossBar);
+                    }
                     player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 1.5f);
                     Component message = LegacyComponentSerializer.legacyAmpersand().deserialize(plugin.getConfig().getString("messages.protection-ended", "&aYour spawn protection has ended."));
                     player.sendActionBar(message);
                     applyNameProtectionState(player, false);
                     cancel();
                 } else {
-                    protectionTime.put(uuid, timeLeft);
-                    if (SpawnProtection.hasBuffSMPEnabled) {
-                        if (!ShowCooldown.viewingPlayers.containsKey(uuid)) {
-                            player.sendActionBar(Component.text(formatTime(timeLeft)).color(NamedTextColor.DARK_AQUA));
+                    protectionTime.put(player.getUniqueId(), timeLeft);
+                    String formatted = formatTime(timeLeft);
+                    if (displayMode.equalsIgnoreCase("bossbar")) {
+                        BossBar bossBar = bossBars.get(player.getUniqueId());
+                        if (bossBar != null) {
+                            bossBar.name(Component.text("Spawn Protection: " + formatted).color(NamedTextColor.AQUA));
+                            bossBar.progress((float) timeLeft / seconds);
                         }
-                    }else {
-                        player.sendActionBar(Component.text(formatTime(timeLeft)).color(NamedTextColor.DARK_AQUA));
+                    } else {
+                        if (SpawnProtection.hasBuffSMPEnabled) {
+                            if (!ShowCooldown.viewingPlayers.containsKey(player.getUniqueId())) {
+                                player.sendActionBar(Component.text(formatted).color(NamedTextColor.DARK_AQUA));
+                            }
+                        } else {
+                            player.sendActionBar(Component.text(formatted).color(NamedTextColor.DARK_AQUA));
+                        }
                     }
                 }
             }
@@ -157,7 +229,7 @@ public class ProtectionManager {
         }
 
         Component baseName = Component.text(playerName);
-        Component finalName = teamPrefix.append(baseName);
+        Component finalName = teamPrefix.append(baseName.color(NamedTextColor.WHITE));
 
         if (hasProtection) {
             finalName = finalName.append(Component.text(" (S)").color(NamedTextColor.DARK_AQUA));
@@ -169,6 +241,10 @@ public class ProtectionManager {
     public void emptyProtection() {
         protectionTime.clear();
         for (Player player : Bukkit.getOnlinePlayers()) {
+            BossBar bar = bossBars.remove(player.getUniqueId());
+            if (bar != null) {
+                bar.removeViewer(player);
+            }
             applyNameProtectionState(player,false);
         }
     }
@@ -201,6 +277,25 @@ public class ProtectionManager {
             return;
         }
 
+        String displayMode = plugin.getConfig().getString("protection.protection-display", "actionbar");
+        BossBar bar = bossBars.remove(player.getUniqueId());
+        if (bar != null) {
+            bar.removeViewer(player);
+        }
+
+        if (displayMode.equalsIgnoreCase("bossbar")) {
+            BossBar bossBar = BossBar.bossBar(
+                    Component.text("Spawn Protection").color(NamedTextColor.AQUA),
+                    1.0f,
+                    BossBar.Color.BLUE,
+                    BossBar.Overlay.PROGRESS
+            );
+            player.showBossBar(bossBar);
+            bossBars.put(player.getUniqueId(), bossBar);
+        }
+
+        int finalTime = timeLeft;
+
         timers.put(uuid, new BukkitRunnable() {
             @Override
             public void run() {
@@ -210,19 +305,32 @@ public class ProtectionManager {
                 if (timeLeft <= 0) {
                     protectionTime.remove(uuid);
                     timers.remove(uuid);
+                    BossBar bossBar = bossBars.remove(player.getUniqueId());
+                    if (bossBar != null) {
+                        player.hideBossBar(bossBar);
+                    }
                     player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 1.5f);
                     Component message = LegacyComponentSerializer.legacyAmpersand().deserialize(plugin.getConfig().getString("messages.protection-ended", "&aYour spawn protection has ended."));
                     player.sendActionBar(message);
                     applyNameProtectionState(player, false);
                     cancel();
                 } else {
-                    protectionTime.put(uuid, timeLeft);
-                    if (SpawnProtection.hasBuffSMPEnabled) {
-                        if (!ShowCooldown.viewingPlayers.containsKey(uuid)) {
-                            player.sendActionBar(Component.text(formatTime(timeLeft)).color(NamedTextColor.DARK_AQUA));
+                    protectionTime.put(player.getUniqueId(), timeLeft);
+                    String formatted = formatTime(timeLeft);
+                    if (displayMode.equalsIgnoreCase("bossbar")) {
+                        BossBar bossBar = bossBars.get(player.getUniqueId());
+                        if (bossBar != null) {
+                            bossBar.name(Component.text("Spawn Protection: " + formatted).color(NamedTextColor.AQUA));
+                            bossBar.progress((float) timeLeft / finalTime);
                         }
-                    }else {
-                        player.sendActionBar(Component.text(formatTime(timeLeft)).color(NamedTextColor.DARK_AQUA));
+                    } else {
+                        if (SpawnProtection.hasBuffSMPEnabled) {
+                            if (!ShowCooldown.viewingPlayers.containsKey(player.getUniqueId())) {
+                                player.sendActionBar(Component.text(formatted).color(NamedTextColor.DARK_AQUA));
+                            }
+                        } else {
+                            player.sendActionBar(Component.text(formatted).color(NamedTextColor.DARK_AQUA));
+                        }
                     }
                 }
             }

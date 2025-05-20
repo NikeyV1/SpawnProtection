@@ -1,7 +1,9 @@
 package de.nikey.spawnProtection.Commands;
 
 import de.nikey.spawnProtection.Listener.ProtectionListener;
+import de.nikey.spawnProtection.Managers.DailyProtectionManager;
 import de.nikey.spawnProtection.Managers.ProtectionManager;
+import de.nikey.spawnProtection.Managers.TodayPlaytimeManager;
 import de.nikey.spawnProtection.SpawnProtection;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -16,12 +18,9 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.time.LocalDate;
 import java.util.*;
 
 public class SpawnProtectionCommand implements TabExecutor {
-
-    private static final Map<UUID, LocalDate> lastClaimed = new HashMap<>();
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String @NotNull [] args) {
@@ -49,17 +48,33 @@ public class SpawnProtectionCommand implements TabExecutor {
                     player.sendMessage(Component.text("Cleared spawn protection from everyone").color(NamedTextColor.GREEN));
                     return true;
                 }else if (args[0].equalsIgnoreCase("claim")) {
-                    UUID uuid = player.getUniqueId();
+                    ProtectionManager protectionManager = SpawnProtection.getProtectionManager();
+                    DailyProtectionManager dailyProtectionManager = SpawnProtection.getDailyProtectionManager();
+                    TodayPlaytimeManager playtimeManager = SpawnProtection.getTodayPlaytimeManager();
 
-                    if (SpawnProtection.getDailyProtectionManager().hasClaimedToday(uuid)) {
-                        player.sendMessage(Component.text("You have already claimed your daily spawn protection today!", NamedTextColor.RED));
+                    if (!protectionManager.getPlugin().getConfig().getBoolean("claim.enabled", true)) {
+                        player.sendMessage("§cClaiming spawn protection is currently disabled.");
                         return true;
                     }
 
-                    SpawnProtection.getDailyProtectionManager().setClaimedToday(uuid);
-                    SpawnProtection.getProtectionManager().grantProtection(player, 30 * 60);
+                    int requiredMinutes = protectionManager.getPlugin().getConfig().getInt("claim.required-online-minutes", 15);
+                    int todayMinutes = playtimeManager.getTodayMinutes(player.getUniqueId());
+
+                    if (todayMinutes < requiredMinutes) {
+                        player.sendMessage("§cYou must play at least " + requiredMinutes + " minutes today to claim spawn protection.");
+                        return true;
+                    }
+
+                    if (dailyProtectionManager.hasClaimedToday(player.getUniqueId())) {
+                        player.sendMessage("§cYou have already claimed your daily spawn protection.");
+                        return true;
+                    }
+
+                    dailyProtectionManager.setClaimedToday(player.getUniqueId());
+                    protectionManager.grantProtection(player, 30 * 60);
                     player.sendMessage(Component.text("You have received 30 minutes of spawn protection!", NamedTextColor.GREEN));
-                    player.playSound(player.getLocation(), Sound.BLOCK_BEACON_ACTIVATE,1,2);
+                    player.playSound(player.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, 1f, 2f);
+                    return true;
                 }
             }else if (args.length == 2) {
                 if (args[0].equalsIgnoreCase("end")) {

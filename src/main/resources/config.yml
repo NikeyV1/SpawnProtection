@@ -1,10 +1,12 @@
 protection:
   default-minutes: 2
   first-join-minutes: 2
+  protection-display: actionbar # Mögliche Werte: actionbar, bossbar
 
 claim:
   enabled: true
   required-online-minutes: 15
+  offline-countdown: false # true = Timer läuft auch wenn Spieler offline ist
 
 proximity-detection:
   radius: 52
