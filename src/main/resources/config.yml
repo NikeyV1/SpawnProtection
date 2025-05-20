@@ -5,6 +5,7 @@ protection:
 
 claim:
   enabled: true
+  duration: 30 # in minutes
   required-online-minutes: 15
   offline-countdown: false # true = Timer läuft auch wenn Spieler offline ist
 

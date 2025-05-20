@@ -71,8 +71,8 @@ public class SpawnProtectionCommand implements TabExecutor {
                     }
 
                     dailyProtectionManager.setClaimedToday(player.getUniqueId());
-                    protectionManager.grantProtection(player, 30 * 60);
-                    player.sendMessage(Component.text("You have received 30 minutes of spawn protection!", NamedTextColor.GREEN));
+                    protectionManager.grantProtection(player, SpawnProtection.getPlugin().getConfig().getInt("claim.duration",30) * 60);
+                    player.sendMessage(Component.text("You have received your daily spawn protection!", NamedTextColor.GREEN));
                     player.playSound(player.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, 1f, 2f);
                     return true;
                 }
