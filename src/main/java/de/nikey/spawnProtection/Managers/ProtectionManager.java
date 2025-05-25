@@ -27,14 +27,23 @@ public class ProtectionManager {
     private final Map<UUID, BossBar> bossBars = new HashMap<>();
     private final int defaultProtectionMinutes;
     private final int firstJoinProtectionMinutes;
+    private final boolean continueOffline;
 
     public ProtectionManager(Plugin plugin) {
         this.plugin = plugin;
         FileConfiguration config = plugin.getConfig();
         this.defaultProtectionMinutes = config.getInt("protection.default-minutes", 5);
         this.firstJoinProtectionMinutes = config.getInt("protection.first-join-minutes", 10);
+        this.continueOffline = config.getBoolean("protection.continue-offline", false);
     }
 
+    public boolean isContinueOffline() {
+        return continueOffline;
+    }
+
+    public String getDisplay() {
+        return plugin.getConfig().getString("protection.protection-display", "actionbar");
+    }
 
     public void startProtection(Player player, boolean firstJoin) {
         int sec = firstJoin ? firstJoinProtectionMinutes : defaultProtectionMinutes;
@@ -68,7 +77,17 @@ public class ProtectionManager {
         timers.put(player.getUniqueId(), new BukkitRunnable() {
             @Override
             public void run() {
-                if (!player.isOnline()) return;
+                if (!player.isOnline()) {
+                    int timeLeft = protectionTime.getOrDefault(player.getUniqueId(), 0) - 1;
+                    if (timeLeft <= 0) {
+                        protectionTime.remove(player.getUniqueId());
+                        timers.remove(player.getUniqueId());
+                        cancel();
+                    } else {
+                        protectionTime.put(player.getUniqueId(), timeLeft);
+                    }
+                    return;
+                }
 
                 int timeLeft = protectionTime.getOrDefault(player.getUniqueId(), 0) - 1;
                 if (timeLeft <= 0) {
@@ -76,6 +95,7 @@ public class ProtectionManager {
                     timers.remove(player.getUniqueId());
 
                     BossBar bossBar = bossBars.remove(player.getUniqueId());
+                    if (!player.isOnline())return;
                     if (bossBar != null) {
                         player.hideBossBar(bossBar);
                     }
@@ -88,8 +108,8 @@ public class ProtectionManager {
                 } else {
                     protectionTime.put(player.getUniqueId(), timeLeft);
 
+                    if (!player.isOnline())return;
                     String formatted = formatTime(timeLeft);
-
                     if (displayMode.equalsIgnoreCase("bossbar")) {
                         BossBar bossBar = bossBars.get(player.getUniqueId());
                         if (bossBar != null) {
@@ -180,13 +200,24 @@ public class ProtectionManager {
         timers.put(uuid, new BukkitRunnable() {
             @Override
             public void run() {
-                if (!player.isOnline()) return;
+                if (!player.isOnline()) {
+                    int timeLeft = protectionTime.getOrDefault(player.getUniqueId(), 0) - 1;
+                    if (timeLeft <= 0) {
+                        protectionTime.remove(player.getUniqueId());
+                        timers.remove(player.getUniqueId());
+                        cancel();
+                    } else {
+                        protectionTime.put(player.getUniqueId(), timeLeft);
+                    }
+                    return;
+                }
 
                 int timeLeft = protectionTime.getOrDefault(uuid, 0) - 1;
                 if (timeLeft <= 0) {
                     protectionTime.remove(uuid);
                     timers.remove(uuid);
                     BossBar bossBar = bossBars.remove(player.getUniqueId());
+                    if (!player.isOnline())return;
                     if (bossBar != null) {
                         player.hideBossBar(bossBar);
                     }
@@ -197,6 +228,7 @@ public class ProtectionManager {
                     cancel();
                 } else {
                     protectionTime.put(player.getUniqueId(), timeLeft);
+                    if (!player.isOnline())return;
                     String formatted = formatTime(timeLeft);
                     if (displayMode.equalsIgnoreCase("bossbar")) {
                         BossBar bossBar = bossBars.get(player.getUniqueId());
@@ -279,6 +311,7 @@ public class ProtectionManager {
 
         String displayMode = plugin.getConfig().getString("protection.protection-display", "actionbar");
         BossBar bar = bossBars.remove(player.getUniqueId());
+        if (!player.isOnline())return;
         if (bar != null) {
             bar.removeViewer(player);
         }
@@ -299,7 +332,17 @@ public class ProtectionManager {
         timers.put(uuid, new BukkitRunnable() {
             @Override
             public void run() {
-                if (!player.isOnline()) return;
+                if (!player.isOnline()) {
+                    int timeLeft = protectionTime.getOrDefault(player.getUniqueId(), 0) - 1;
+                    if (timeLeft <= 0) {
+                        protectionTime.remove(player.getUniqueId());
+                        timers.remove(player.getUniqueId());
+                        cancel();
+                    } else {
+                        protectionTime.put(player.getUniqueId(), timeLeft);
+                    }
+                    return;
+                }
 
                 int timeLeft = protectionTime.getOrDefault(uuid, 0) - 1;
                 if (timeLeft <= 0) {
@@ -316,6 +359,7 @@ public class ProtectionManager {
                     cancel();
                 } else {
                     protectionTime.put(player.getUniqueId(), timeLeft);
+                    if (!player.isOnline())return;
                     String formatted = formatTime(timeLeft);
                     if (displayMode.equalsIgnoreCase("bossbar")) {
                         BossBar bossBar = bossBars.get(player.getUniqueId());

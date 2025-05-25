@@ -29,7 +29,13 @@ public class ProtectionListener implements Listener {
     @EventHandler
     public void onDeath(PlayerDeathEvent event) {
         Player player = event.getEntity();
-        manager.startProtection(player, false);
+        if (!SpawnProtection.getPlugin().getConfig().getBoolean("protection.restart-when-dying",false)) {
+            if (!manager.isProtected(player)) {
+                manager.startProtection(player, false);
+            }
+        }else {
+            manager.startProtection(player, false);
+        }
 
         UUID deadPlayerUUID = player.getUniqueId();
 
@@ -41,7 +47,9 @@ public class ProtectionListener implements Listener {
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
-        manager.pauseProtection(player);
+        if (!SpawnProtection.getProtectionManager().isContinueOffline()) {
+            manager.pauseProtection(player);
+        }
     }
 
     @EventHandler
@@ -51,7 +59,9 @@ public class ProtectionListener implements Listener {
         if (!player.hasPlayedBefore()) {
             manager.startProtection(player, true);
         } else if (manager.hasProtection(player.getUniqueId())) {
-            manager.resumeProtection(player);
+            if (!SpawnProtection.getProtectionManager().isContinueOffline()) {
+                manager.resumeProtection(player);
+            }
         }
     }
 

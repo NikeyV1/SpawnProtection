@@ -1,13 +1,14 @@
 protection:
   default-minutes: 2
   first-join-minutes: 2
-  protection-display: actionbar # Mögliche Werte: actionbar, bossbar
+  protection-display: actionbar # Possible values: actionbar, bossbar
+  restart-when-dying: false # When a player dies with protection if it should restart
+  continue-offline: false
 
-claim:
+claim: # A player can claim spawnprotection once per day
   enabled: true
-  duration: 30 # in minutes
-  required-online-minutes: 15
-  offline-countdown: false # true = Timer läuft auch wenn Spieler offline ist
+  duration: 30 # In minutes
+  required-online-minutes: 15 #Requiered online minutes to claim spawnprotection
 
 proximity-detection:
   radius: 52
