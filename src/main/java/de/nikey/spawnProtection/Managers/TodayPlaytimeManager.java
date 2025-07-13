@@ -35,7 +35,7 @@ public class TodayPlaytimeManager {
                 }
                 save();
             }
-        }.runTaskTimer(plugin, 20 * 60L, 20 * 60L); // jede Minute
+        }.runTaskTimer(plugin, 20 * 60L, 20 * 60L);
     }
 
     public int getTodayMinutes(UUID uuid) {

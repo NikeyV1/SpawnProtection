@@ -47,7 +47,12 @@ public class SpawnProtectionCommand implements TabExecutor {
 
                     player.sendMessage(Component.text("Cleared spawn protection from everyone").color(NamedTextColor.GREEN));
                     return true;
-                }else if (args[0].equalsIgnoreCase("claim")) {
+                } else if (args[0].equalsIgnoreCase("reload")) {
+                    if (!player.isOp())return true;
+                    SpawnProtection.getPlugin().reloadConfig();
+
+                    player.sendMessage(Component.text("Reloaded the config!").color(NamedTextColor.GREEN));
+                } else if (args[0].equalsIgnoreCase("claim")) {
                     ProtectionManager protectionManager = SpawnProtection.getProtectionManager();
                     DailyProtectionManager dailyProtectionManager = SpawnProtection.getDailyProtectionManager();
                     TodayPlaytimeManager playtimeManager = SpawnProtection.getTodayPlaytimeManager();
@@ -169,7 +174,7 @@ public class SpawnProtectionCommand implements TabExecutor {
 
         if (command.getName().equalsIgnoreCase("spawnprotection")) {
             if (args.length == 1) {
-                return Arrays.asList("end", "confirm", "add", "clear", "claim");
+                return Arrays.asList("end", "confirm", "add", "clear", "claim", "reload");
             } else if (args.length == 2) {
                 if (args[0].equalsIgnoreCase("end") || args[0].equalsIgnoreCase("confirm") || args[0].equalsIgnoreCase("add")
                         || args[0].equalsIgnoreCase("clear")) {

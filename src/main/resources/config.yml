@@ -5,6 +5,10 @@ protection:
   restart-when-dying: false # When a player dies with protection if it should restart
   continue-offline: false
 
+tab-list:
+  enabled: true
+  prefix: "§3(S)"
+
 claim: # A player can claim spawnprotection once per day
   enabled: true
   duration: 30 # In minutes

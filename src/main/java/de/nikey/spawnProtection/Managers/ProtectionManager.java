@@ -255,6 +255,7 @@ public class ProtectionManager {
     public void applyNameProtectionState(Player player, boolean hasProtection) {
         String playerName = player.getName();
         Component teamPrefix = Component.empty();
+        if (!plugin.getConfig().getBoolean("tab-list.enabled", true))return;
 
         if (player.getScoreboard().getEntryTeam(playerName) != null) {
             teamPrefix = player.getScoreboard().getEntryTeam(playerName).prefix();
@@ -263,8 +264,10 @@ public class ProtectionManager {
         Component baseName = Component.text(playerName);
         Component finalName = teamPrefix.append(baseName.color(NamedTextColor.WHITE));
 
+        Component prefix = LegacyComponentSerializer.legacyAmpersand().deserialize(plugin.getConfig().getString("tab-list.prefix", "(S)"));
+
         if (hasProtection) {
-            finalName = finalName.append(Component.text(" (S)").color(NamedTextColor.DARK_AQUA));
+            finalName = finalName.append(Component.text(" ").append(prefix));
         }
 
         player.playerListName(finalName);
