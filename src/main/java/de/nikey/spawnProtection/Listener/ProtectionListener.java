@@ -7,6 +7,7 @@ import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -70,39 +71,73 @@ public class ProtectionListener implements Listener {
 
     @EventHandler
     public void onEntityDamage(EntityDamageByEntityEvent event) {
-        if (!(event.getDamager() instanceof Player damager)) return;
         if (!(event.getEntity() instanceof Player victim)) return;
+        if (event.getDamager() instanceof Player damager) {
+            ProtectionManager protectionManager = SpawnProtection.getProtectionManager();
 
-        ProtectionManager protectionManager = SpawnProtection.getProtectionManager();
+            if (protectionManager.isProtected(damager)) {
+                event.setCancelled(true);
 
-        if (protectionManager.isProtected(damager)) {
+                damager.sendMessage(Component.text()
+                        .append(Component.text("⚠ ", NamedTextColor.RED))
+                        .append(Component.text("You cannot attack while under spawn protection! ", NamedTextColor.RED))
+                        .append(Component.text("[End Protection]", NamedTextColor.YELLOW)
+                                .clickEvent(ClickEvent.runCommand("/spawnprotection end"))
+                                .hoverEvent(HoverEvent.showText(Component.text("Click to end your protection!", NamedTextColor.RED))))
+                );
+                return;
+            }
+
+            if (!protectionManager.isProtected(victim)) return;
+
+            if (pendingConfirmations.getOrDefault(damager.getUniqueId(), null) != null
+                    && pendingConfirmations.get(damager.getUniqueId()).equals(victim.getUniqueId())) {
+                return;
+            }
+
             event.setCancelled(true);
 
             damager.sendMessage(Component.text()
                     .append(Component.text("⚠ ", NamedTextColor.RED))
-                    .append(Component.text("You cannot attack while under spawn protection! ", NamedTextColor.RED))
-                    .append(Component.text("[End Protection]", NamedTextColor.YELLOW)
-                            .clickEvent(ClickEvent.runCommand("/spawnprotection end"))
-                            .hoverEvent(HoverEvent.showText(Component.text("Click to end your protection!", NamedTextColor.RED))))
+                    .append(Component.text("This player has spawn protection! ", NamedTextColor.RED))
+                    .append(Component.text("[Attack Anyway]", NamedTextColor.YELLOW)
+                            .clickEvent(ClickEvent.runCommand("/spawnprotection confirm " + victim.getName()))
+                            .hoverEvent(HoverEvent.showText(Component.text("Click to attack at your own risk!", NamedTextColor.RED))))
             );
-            return;
+        }else {
+            if (event.getDamager() instanceof Projectile proj && proj.getShooter() instanceof Player damager) {
+                ProtectionManager protectionManager = SpawnProtection.getProtectionManager();
+
+                if (protectionManager.isProtected(damager)) {
+                    event.setCancelled(true);
+
+                    damager.sendMessage(Component.text()
+                            .append(Component.text("⚠ ", NamedTextColor.RED))
+                            .append(Component.text("You cannot attack while under spawn protection! ", NamedTextColor.RED))
+                            .append(Component.text("[End Protection]", NamedTextColor.YELLOW)
+                                    .clickEvent(ClickEvent.runCommand("/spawnprotection end"))
+                                    .hoverEvent(HoverEvent.showText(Component.text("Click to end your protection!", NamedTextColor.RED))))
+                    );
+                    return;
+                }
+
+                if (!protectionManager.isProtected(victim)) return;
+
+                if (pendingConfirmations.getOrDefault(damager.getUniqueId(), null) != null
+                        && pendingConfirmations.get(damager.getUniqueId()).equals(victim.getUniqueId())) {
+                    return;
+                }
+
+                event.setCancelled(true);
+
+                damager.sendMessage(Component.text()
+                        .append(Component.text("⚠ ", NamedTextColor.RED))
+                        .append(Component.text("This player has spawn protection! ", NamedTextColor.RED))
+                        .append(Component.text("[Attack Anyway]", NamedTextColor.YELLOW)
+                                .clickEvent(ClickEvent.runCommand("/spawnprotection confirm " + victim.getName()))
+                                .hoverEvent(HoverEvent.showText(Component.text("Click to attack at your own risk!", NamedTextColor.RED))))
+                );
+            }
         }
-
-        if (!protectionManager.isProtected(victim)) return;
-
-        if (pendingConfirmations.getOrDefault(damager.getUniqueId(), null) != null
-                && pendingConfirmations.get(damager.getUniqueId()).equals(victim.getUniqueId())) {
-            return;
-        }
-
-        event.setCancelled(true);
-
-        damager.sendMessage(Component.text()
-                .append(Component.text("⚠ ", NamedTextColor.RED))
-                .append(Component.text("This player has spawn protection! ", NamedTextColor.RED))
-                .append(Component.text("[Attack Anyway]", NamedTextColor.YELLOW)
-                        .clickEvent(ClickEvent.runCommand("/spawnprotection confirm " + victim.getName()))
-                        .hoverEvent(HoverEvent.showText(Component.text("Click to attack at your own risk!", NamedTextColor.RED))))
-        );
     }
 }
