@@ -97,6 +97,11 @@ public class SpawnProtectionCommand implements TabExecutor {
                     player.sendMessage(Component.text("Your spawn protection has been disabled.", NamedTextColor.GREEN));
                     return true;
                 }else if (args[0].equalsIgnoreCase("confirm")) {
+                    if (SpawnProtection.getPlugin().getConfig().getBoolean("protection.disable-attack-confirm",false)) {
+                        player.sendMessage(Component.text("This feature is currently disabled!",NamedTextColor.RED));
+                        return true;
+                    }
+
                     UUID playerUniqueId = Bukkit.getPlayerUniqueId(args[1]);
                     ProtectionListener.pendingConfirmations.put(player.getUniqueId(), playerUniqueId);
 
@@ -112,7 +117,7 @@ public class SpawnProtectionCommand implements TabExecutor {
 
                     player.sendMessage(Component.text("You have chosen to attack this player for 10 min. Be careful!", NamedTextColor.YELLOW));
                     return true;
-                }else if (args[0].equalsIgnoreCase("add")) {
+                }else if (args[0].equalsIgnoreCase("set")) {
                     if (!player.isOp())return true;
                     ProtectionManager protectionManager = SpawnProtection.getProtectionManager();
 
@@ -145,7 +150,7 @@ public class SpawnProtectionCommand implements TabExecutor {
                     return true;
                 }
             }else if (args.length == 3) {
-                if (args[0].equalsIgnoreCase("add")) {
+                if (args[0].equalsIgnoreCase("set")) {
                     if (!player.isOp())return true;
                     ProtectionManager protectionManager = SpawnProtection.getProtectionManager();
 
@@ -153,12 +158,12 @@ public class SpawnProtectionCommand implements TabExecutor {
                     if (target != null) {
                         protectionManager.grantProtection(target, Integer.parseInt(args[2]));
 
-                        player.sendMessage(Component.text("Added " + args[2] + " sek spawn protection time").color(NamedTextColor.GREEN));
+                        player.sendMessage(Component.text("Set " + args[2] + " sek spawn protection time").color(NamedTextColor.GREEN));
                     }else {
                         OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(args[1]);
                         protectionManager.grantOfflineProtection(offlinePlayer, Integer.parseInt(args[2]));
 
-                        player.sendMessage(Component.text("Added " + args[2] + " sek spawn protection time").color(NamedTextColor.GREEN));
+                        player.sendMessage(Component.text("Set " + args[2] + " sek spawn protection time").color(NamedTextColor.GREEN));
                     }
                     return true;
                 }
@@ -174,9 +179,9 @@ public class SpawnProtectionCommand implements TabExecutor {
 
         if (command.getName().equalsIgnoreCase("spawnprotection")) {
             if (args.length == 1) {
-                return Arrays.asList("end", "confirm", "add", "clear", "claim", "reload");
+                return Arrays.asList("end", "confirm", "set", "clear", "claim", "reload");
             } else if (args.length == 2) {
-                if (args[0].equalsIgnoreCase("end") || args[0].equalsIgnoreCase("confirm") || args[0].equalsIgnoreCase("add")
+                if (args[0].equalsIgnoreCase("end") || args[0].equalsIgnoreCase("confirm") || args[0].equalsIgnoreCase("set")
                         || args[0].equalsIgnoreCase("clear")) {
                     return Arrays.stream(Bukkit.getOfflinePlayers())
                             .map(OfflinePlayer::getName)
@@ -186,7 +191,7 @@ public class SpawnProtectionCommand implements TabExecutor {
 
                 }
             }else if (args.length == 3) {
-                if (args[0].equalsIgnoreCase("add")) {
+                if (args[0].equalsIgnoreCase("set")) {
                     return List.of("sek");
                 }
             }

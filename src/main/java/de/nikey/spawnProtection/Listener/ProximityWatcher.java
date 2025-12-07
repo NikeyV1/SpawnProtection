@@ -6,6 +6,7 @@ import de.nikey.trust.Trust;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -51,6 +52,8 @@ public class ProximityWatcher {
                     if (SpawnProtection.hasTrustEnabled) {
                         if (Trust.isTrusted(protectedPlayer.getUniqueId(),other.getUniqueId()))continue;
                     }
+                    if (!protectedPlayer.canSee(other))continue;
+                    if (other.getGameMode() == GameMode.SPECTATOR || other.getGameMode() == GameMode.CREATIVE)continue;
 
                     int seconds = nearbyMap.getOrDefault(other.getUniqueId(), 0) + 2;
                     nearbyMap.put(other.getUniqueId(), seconds);

@@ -4,6 +4,7 @@ protection:
   protection-display: actionbar # Possible values: actionbar, bossbar
   restart-when-dying: false # When a player dies with protection if it should restart
   continue-offline: false
+  disable-attack-confirm: false
 
 tab-list:
   enabled: true
