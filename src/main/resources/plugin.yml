@@ -7,3 +7,8 @@ website: https://github.com/NikeyV1
 commands:
   spawnprotection:
     description: Spawn Protection command
+
+permissions:
+  spawnprotection.admin:
+    description: "Allows to use admin commands in spawnprotection"
+    default: op

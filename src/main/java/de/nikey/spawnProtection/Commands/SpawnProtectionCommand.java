@@ -40,7 +40,7 @@ public class SpawnProtectionCommand implements TabExecutor {
                     player.sendMessage(Component.text("Your spawn protection has been disabled.", NamedTextColor.GREEN));
                     return true;
                 }else if (args[0].equalsIgnoreCase("clear")) {
-                    if (!player.isOp())return true;
+                    if (!player.hasPermission("spawnprotection.admin"))return true;
                     ProtectionManager protectionManager = SpawnProtection.getProtectionManager();
 
                     protectionManager.emptyProtection();
@@ -48,7 +48,7 @@ public class SpawnProtectionCommand implements TabExecutor {
                     player.sendMessage(Component.text("Cleared spawn protection from everyone").color(NamedTextColor.GREEN));
                     return true;
                 } else if (args[0].equalsIgnoreCase("reload")) {
-                    if (!player.isOp())return true;
+                    if (!player.hasPermission("spawnprotection.admin"))return true;
                     SpawnProtection.getPlugin().reloadConfig();
 
                     player.sendMessage(Component.text("Reloaded the config!").color(NamedTextColor.GREEN));
@@ -83,7 +83,7 @@ public class SpawnProtectionCommand implements TabExecutor {
                 }
             }else if (args.length == 2) {
                 if (args[0].equalsIgnoreCase("end")) {
-                    if (!player.isOp())return true;
+                    if (!player.hasPermission("spawnprotection.admin"))return true;
                     UUID playerUniqueId = Bukkit.getPlayerUniqueId(args[1]);
 
                     ProtectionManager protectionManager = SpawnProtection.getProtectionManager();
@@ -118,7 +118,7 @@ public class SpawnProtectionCommand implements TabExecutor {
                     player.sendMessage(Component.text("You have chosen to attack this player for 10 min. Be careful!", NamedTextColor.YELLOW));
                     return true;
                 }else if (args[0].equalsIgnoreCase("set")) {
-                    if (!player.isOp())return true;
+                    if (!player.hasPermission("spawnprotection.admin"))return true;
                     ProtectionManager protectionManager = SpawnProtection.getProtectionManager();
 
                     Player target = Bukkit.getPlayer(args[1]);
@@ -129,7 +129,7 @@ public class SpawnProtectionCommand implements TabExecutor {
                     }
                     return true;
                 }else if (args[0].equalsIgnoreCase("clear")) {
-                    if (!player.isOp())return true;
+                    if (!player.hasPermission("spawnprotection.admin"))return true;
                     ProtectionManager protectionManager = SpawnProtection.getProtectionManager();
 
                     if (args[1].equalsIgnoreCase("@a")) {
@@ -151,7 +151,7 @@ public class SpawnProtectionCommand implements TabExecutor {
                 }
             }else if (args.length == 3) {
                 if (args[0].equalsIgnoreCase("set")) {
-                    if (!player.isOp())return true;
+                    if (!player.hasPermission("spawnprotection.admin"))return true;
                     ProtectionManager protectionManager = SpawnProtection.getProtectionManager();
 
                     Player target = Bukkit.getPlayer(args[1]);
@@ -175,7 +175,7 @@ public class SpawnProtectionCommand implements TabExecutor {
 
     @Override
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
-        if (!(sender instanceof Player player)) return Collections.emptyList();
+        if (!(sender instanceof Player)) return Collections.emptyList();
 
         if (command.getName().equalsIgnoreCase("spawnprotection")) {
             if (args.length == 1) {
