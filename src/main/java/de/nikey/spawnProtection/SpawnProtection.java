@@ -6,6 +6,7 @@ import de.nikey.spawnProtection.Listener.ProximityWatcher;
 import de.nikey.spawnProtection.Managers.DailyProtectionManager;
 import de.nikey.spawnProtection.Managers.ProtectionManager;
 import de.nikey.spawnProtection.Managers.TodayPlaytimeManager;
+import de.nikey.spawnProtection.Util.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -48,6 +49,7 @@ public final class SpawnProtection extends JavaPlugin {
             hasBuffSMPEnabled = true;
             getLogger().info("BuffSMP detected! Compatibility features enabled");
         }
+        Metrics metrics = new Metrics(this,	28280);
     }
 
     @Override
