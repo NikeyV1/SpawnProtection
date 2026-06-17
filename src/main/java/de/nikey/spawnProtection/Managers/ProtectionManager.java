@@ -25,15 +25,15 @@ public class ProtectionManager {
     public final Map<UUID, Integer> protectionTime = new HashMap<>();
     private final Map<UUID, BukkitTask> timers = new HashMap<>();
     private final Map<UUID, BossBar> bossBars = new HashMap<>();
-    private final int defaultProtectionMinutes;
-    private final int firstJoinProtectionMinutes;
+    private final int defaultProtectionSeconds;
+    private final int firstJoinProtectionSeconds;
     private final boolean continueOffline;
 
     public ProtectionManager(Plugin plugin) {
         this.plugin = plugin;
         FileConfiguration config = plugin.getConfig();
-        this.defaultProtectionMinutes = config.getInt("protection.default-minutes", 5);
-        this.firstJoinProtectionMinutes = config.getInt("protection.first-join-minutes", 10);
+        this.defaultProtectionSeconds = config.getInt("protection.default-seconds", 120);
+        this.firstJoinProtectionSeconds = config.getInt("protection.first-join-seconds", 120);
         this.continueOffline = config.getBoolean("protection.continue-offline", false);
     }
 
@@ -46,10 +46,10 @@ public class ProtectionManager {
     }
 
     public void startProtection(Player player, boolean firstJoin) {
-        int sec = firstJoin ? firstJoinProtectionMinutes : defaultProtectionMinutes;
+        int sec = firstJoin ? firstJoinProtectionSeconds : defaultProtectionSeconds;
         if (sec <= 0) return;
 
-        protectionTime.put(player.getUniqueId(), sec * 60);
+        protectionTime.put(player.getUniqueId(), sec);
         applyNameProtectionState(player,true);
 
         if (timers.containsKey(player.getUniqueId())) {
@@ -72,7 +72,7 @@ public class ProtectionManager {
             bossBars.put(player.getUniqueId(), bossBar);
         }
 
-        int totalSeconds = sec * 60;
+        int totalSeconds = sec;
 
         timers.put(player.getUniqueId(), new BukkitRunnable() {
             @Override
