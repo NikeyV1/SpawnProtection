@@ -16,7 +16,8 @@ import java.util.UUID;
 public class TodayPlaytimeManager {
     private final File file;
     private final YamlConfiguration data;
-    private final Map<UUID, Integer> sessionMinutes = new HashMap<>();
+    private final Map<UUID, Integer> baseSeconds = new HashMap<>();
+    private final Map<UUID, Integer> sessionSeconds = new HashMap<>();
     private final String today;
 
     public TodayPlaytimeManager(Plugin plugin) {
@@ -25,25 +26,31 @@ public class TodayPlaytimeManager {
         this.today = LocalDate.now().toString();
 
         new BukkitRunnable() {
+            int ticks = 0;
+
             @Override
             public void run() {
                 for (Player player : Bukkit.getOnlinePlayers()) {
                     UUID uuid = player.getUniqueId();
-                    sessionMinutes.put(uuid, sessionMinutes.getOrDefault(uuid, 0) + 1);
-                    int total = getStoredMinutes(uuid) + sessionMinutes.get(uuid);
-                    data.set(today + "." + uuid, total);
+                    sessionSeconds.put(uuid, sessionSeconds.getOrDefault(uuid, 0) + 1);
+                    data.set(today + "." + uuid, getTodaySeconds(uuid));
                 }
-                save();
+
+                // Persist once a minute to avoid excessive disk writes.
+                if (++ticks >= 60) {
+                    ticks = 0;
+                    save();
+                }
             }
-        }.runTaskTimer(plugin, 20 * 60L, 20 * 60L);
+        }.runTaskTimer(plugin, 20L, 20L);
     }
 
-    public int getTodayMinutes(UUID uuid) {
-        return getStoredMinutes(uuid) + sessionMinutes.getOrDefault(uuid, 0);
+    public int getTodaySeconds(UUID uuid) {
+        return getStoredSeconds(uuid) + sessionSeconds.getOrDefault(uuid, 0);
     }
 
-    private int getStoredMinutes(UUID uuid) {
-        return data.getInt(today + "." + uuid.toString(), 0);
+    private int getStoredSeconds(UUID uuid) {
+        return baseSeconds.computeIfAbsent(uuid, u -> data.getInt(today + "." + u, 0));
     }
 
     private void save() {

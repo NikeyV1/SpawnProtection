@@ -4,6 +4,7 @@ import de.nikey.spawnProtection.Commands.SpawnProtectionCommand;
 import de.nikey.spawnProtection.Listener.ProtectionListener;
 import de.nikey.spawnProtection.Listener.ProximityWatcher;
 import de.nikey.spawnProtection.Managers.DailyProtectionManager;
+import de.nikey.spawnProtection.Managers.MobProtectionManager;
 import de.nikey.spawnProtection.Managers.ProtectionManager;
 import de.nikey.spawnProtection.Managers.TodayPlaytimeManager;
 import de.nikey.spawnProtection.Util.Metrics;
@@ -21,6 +22,7 @@ import java.util.UUID;
 public final class SpawnProtection extends JavaPlugin {
     private static SpawnProtection plugin;
     private static ProtectionManager protectionManager;
+    private static MobProtectionManager mobProtectionManager;
     private static DailyProtectionManager dailyProtectionManager;
     private static TodayPlaytimeManager todayPlaytimeManager;
 
@@ -32,6 +34,7 @@ public final class SpawnProtection extends JavaPlugin {
         plugin = this;
         saveDefaultConfig();
         protectionManager = new ProtectionManager(this);
+        mobProtectionManager = new MobProtectionManager(this);
         dailyProtectionManager = new DailyProtectionManager(this);
         todayPlaytimeManager = new TodayPlaytimeManager(this);
         getCommand("spawnprotection").setExecutor(new SpawnProtectionCommand());
@@ -104,6 +107,10 @@ public final class SpawnProtection extends JavaPlugin {
 
     public static ProtectionManager getProtectionManager() {
         return protectionManager;
+    }
+
+    public static MobProtectionManager getMobProtectionManager() {
+        return mobProtectionManager;
     }
 
     public static SpawnProtection getPlugin() {

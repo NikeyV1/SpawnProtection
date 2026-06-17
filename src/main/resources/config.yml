@@ -1,10 +1,14 @@
 protection:
-  default-minutes: 2
-  first-join-minutes: 2
+  default-seconds: 120 # In seconds
+  first-join-seconds: 120 # In seconds
   protection-display: actionbar # Possible values: actionbar, bossbar
   restart-when-dying: false # When a player dies with protection if it should restart
   continue-offline: false
   disable-attack-confirm: false
+
+mob-protection: # Protects players from mobs/monsters for a while after they join the server for the first time
+  enabled: true
+  first-join-seconds: 300 # In seconds. Time after the first join during which mobs/monsters can't attack the player
 
 tab-list:
   enabled: true
@@ -12,8 +16,8 @@ tab-list:
 
 claim: # A player can claim spawnprotection once per day
   enabled: true
-  duration: 30 # In minutes
-  required-online-minutes: 15 #Requiered online minutes to claim spawnprotection
+  duration: 1800 # In seconds
+  required-online-seconds: 900 # Required online seconds to claim spawnprotection
 
 proximity-detection:
   radius: 52
@@ -23,3 +27,5 @@ messages:
   protection-ended: "&aYour spawn protection has ended."
   protected-nearby: "&eYou are too close to players who could harm you!"
   aggressor-nearby: "&cDo not chase spawn protected players!"
+  mob-protection-started: "&aMonsters can't attack you for &e%time%&a after your first join."
+  mob-protection-ended: "&aThe protection against monsters has ended."

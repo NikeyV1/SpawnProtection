@@ -6,6 +6,8 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
@@ -59,6 +61,7 @@ public class ProtectionListener implements Listener {
 
         if (!player.hasPlayedBefore()) {
             manager.startProtection(player, true);
+            SpawnProtection.getMobProtectionManager().startFirstJoinProtection(player);
         } else if (manager.hasProtection(player.getUniqueId())) {
             if (!SpawnProtection.getProtectionManager().isContinueOffline()) {
                 manager.resumeProtection(player);
@@ -68,6 +71,30 @@ public class ProtectionListener implements Listener {
 
 
     public static final Map<UUID, UUID> pendingConfirmations = new HashMap<>();
+
+    @EventHandler(ignoreCancelled = true)
+    public void onMobDamage(EntityDamageByEntityEvent event) {
+        if (!(event.getEntity() instanceof Player victim)) return;
+
+        if (!SpawnProtection.getMobProtectionManager().hasMobProtection(victim)) return;
+
+        Entity damager = event.getDamager();
+
+        // Player-vs-player damage is handled separately by the spawn protection logic.
+        if (damager instanceof Player) return;
+
+        // Projectiles shot by another player are also PvP, leave those alone.
+        if (damager instanceof Projectile proj) {
+            if (proj.getShooter() instanceof Player) return;
+            event.setCancelled(true);
+            return;
+        }
+
+        // Any other living entity (zombies, skeletons, creepers, spiders, ...) is a mob.
+        if (damager instanceof LivingEntity) {
+            event.setCancelled(true);
+        }
+    }
 
     @EventHandler
     public void onEntityDamage(EntityDamageByEntityEvent event) {

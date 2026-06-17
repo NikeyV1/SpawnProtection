@@ -62,11 +62,11 @@ public class SpawnProtectionCommand implements TabExecutor {
                         return true;
                     }
 
-                    int requiredMinutes = protectionManager.getPlugin().getConfig().getInt("claim.required-online-minutes", 15);
-                    int todayMinutes = playtimeManager.getTodayMinutes(player.getUniqueId());
+                    int requiredSeconds = protectionManager.getPlugin().getConfig().getInt("claim.required-online-seconds", 900);
+                    int todaySeconds = playtimeManager.getTodaySeconds(player.getUniqueId());
 
-                    if (todayMinutes < requiredMinutes) {
-                        player.sendMessage("§cYou must play at least " + requiredMinutes + " minutes today to claim spawn protection.");
+                    if (todaySeconds < requiredSeconds) {
+                        player.sendMessage("§cYou must play at least " + requiredSeconds + " seconds today to claim spawn protection.");
                         return true;
                     }
 
@@ -76,7 +76,7 @@ public class SpawnProtectionCommand implements TabExecutor {
                     }
 
                     dailyProtectionManager.setClaimedToday(player.getUniqueId());
-                    protectionManager.grantProtection(player, SpawnProtection.getPlugin().getConfig().getInt("claim.duration",30) * 60);
+                    protectionManager.grantProtection(player, SpawnProtection.getPlugin().getConfig().getInt("claim.duration",1800));
                     player.sendMessage(Component.text("You have received your daily spawn protection!", NamedTextColor.GREEN));
                     player.playSound(player.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, 1f, 2f);
                     return true;
