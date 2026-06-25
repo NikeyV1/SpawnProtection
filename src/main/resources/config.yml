@@ -9,6 +9,7 @@ protection:
 mob-protection: # Protects players from mobs/monsters for a while after they join the server for the first time
   enabled: true
   first-join-seconds: 300 # In seconds. Time after the first join during which mobs/monsters can't attack the player
+  protection-display: bossbar # How the remaining mob protection is shown as a cooldown. Possible values: actionbar, bossbar
 
 tab-list:
   enabled: true
