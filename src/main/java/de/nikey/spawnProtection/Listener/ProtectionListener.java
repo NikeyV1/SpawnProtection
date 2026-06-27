@@ -63,9 +63,7 @@ public class ProtectionListener implements Listener {
             manager.startProtection(player, true);
             SpawnProtection.getMobProtectionManager().startFirstJoinProtection(player);
         } else if (manager.hasProtection(player.getUniqueId())) {
-            if (!SpawnProtection.getProtectionManager().isContinueOffline()) {
-                manager.resumeProtection(player);
-            }
+            manager.resumeProtection(player);
         }
     }
 

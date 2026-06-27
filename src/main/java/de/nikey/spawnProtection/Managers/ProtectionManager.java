@@ -312,6 +312,11 @@ public class ProtectionManager {
             return;
         }
 
+        if (timers.containsKey(uuid)) {
+            timers.get(uuid).cancel();
+            timers.remove(uuid);
+        }
+
         String displayMode = plugin.getConfig().getString("protection.protection-display", "actionbar");
         BossBar bar = bossBars.remove(player.getUniqueId());
         if (!player.isOnline())return;
