@@ -40,6 +40,8 @@ public class ProtectionListener implements Listener {
             manager.startProtection(player, false);
         }
 
+        SpawnProtection.getMobProtectionManager().startDeathProtection(player);
+
         UUID deadPlayerUUID = player.getUniqueId();
 
         pendingConfirmations.entrySet().removeIf(entry ->
