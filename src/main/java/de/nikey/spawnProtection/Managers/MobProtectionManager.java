@@ -42,12 +42,16 @@ public class MobProtectionManager {
         return plugin.getConfig().getString("mob-protection.protection-display", "bossbar");
     }
 
-    /**
-     * Grants the configured first-join mob protection if the feature is enabled.
-     */
     public void startFirstJoinProtection(Player player) {
         if (!isEnabled()) return;
         int seconds = plugin.getConfig().getInt("mob-protection.first-join-seconds", 300);
+        grantProtection(player, seconds, true);
+    }
+
+    public void startDeathProtection(Player player) {
+        if (!isEnabled()) return;
+        if (!plugin.getConfig().getBoolean("mob-protection.on-death", false)) return;
+        int seconds = plugin.getConfig().getInt("mob-protection.on-death-seconds", 300);
         grantProtection(player, seconds, true);
     }
 
