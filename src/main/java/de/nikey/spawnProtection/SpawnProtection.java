@@ -4,6 +4,7 @@ import de.nikey.spawnProtection.Commands.SpawnProtectionCommand;
 import de.nikey.spawnProtection.Listener.ProtectionListener;
 import de.nikey.spawnProtection.Listener.ProximityWatcher;
 import de.nikey.spawnProtection.Managers.DailyProtectionManager;
+import de.nikey.spawnProtection.Managers.DeathEffectsManager;
 import de.nikey.spawnProtection.Managers.MobProtectionManager;
 import de.nikey.spawnProtection.Managers.ProtectionManager;
 import de.nikey.spawnProtection.Managers.TodayPlaytimeManager;
@@ -25,6 +26,7 @@ public final class SpawnProtection extends JavaPlugin {
     private static MobProtectionManager mobProtectionManager;
     private static DailyProtectionManager dailyProtectionManager;
     private static TodayPlaytimeManager todayPlaytimeManager;
+    private static DeathEffectsManager deathEffectsManager;
 
     public static boolean hasTrustEnabled = false;
     public static boolean hasBuffSMPEnabled = false;
@@ -37,6 +39,7 @@ public final class SpawnProtection extends JavaPlugin {
         mobProtectionManager = new MobProtectionManager(this);
         dailyProtectionManager = new DailyProtectionManager(this);
         todayPlaytimeManager = new TodayPlaytimeManager(this);
+        deathEffectsManager = new DeathEffectsManager(this);
         getCommand("spawnprotection").setExecutor(new SpawnProtectionCommand());
         getCommand("spawnprotection").setTabCompleter(new SpawnProtectionCommand());
         new ProtectionListener(protectionManager);
@@ -111,6 +114,10 @@ public final class SpawnProtection extends JavaPlugin {
 
     public static MobProtectionManager getMobProtectionManager() {
         return mobProtectionManager;
+    }
+
+    public static DeathEffectsManager getDeathEffectsManager() {
+        return deathEffectsManager;
     }
 
     public static SpawnProtection getPlugin() {

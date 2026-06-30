@@ -26,6 +26,26 @@ proximity-detection:
   radius: 52
   min-time-seconds: 120
 
+death-effects: # Gives players potion effects when they die (applied on respawn)
+  enabled: false
+  effects:
+    weakness:
+      enabled: true
+      type: WEAKNESS # Any valid Bukkit PotionEffectType, e.g. WEAKNESS, SLOWNESS, BLINDNESS, REGENERATION...
+      duration-seconds: 30
+      amplifier: 0 # Effect level, 0 = level 1
+      ambient: true # Whether the effect uses the translucent particle style
+      particles: true # Whether particles are shown at all
+      icon: true # Whether the effect icon is shown in the inventory
+    slowness:
+      enabled: false
+      type: SLOWNESS
+      duration-seconds: 30
+      amplifier: 1
+      ambient: true
+      particles: true
+      icon: true
+
 messages:
   protection-ended: "&aYour spawn protection has ended."
   protected-nearby: "&eYou are too close to players who could harm you!"
