@@ -52,6 +52,7 @@ public class ProtectionListener implements Listener {
 
     @EventHandler
     public void onRespawn(PlayerRespawnEvent event) {
+        if (event.getRespawnReason() != PlayerRespawnEvent.RespawnReason.DEATH) return;
         SpawnProtection.getDeathEffectsManager().applyDeathEffects(event.getPlayer());
     }
 
