@@ -16,6 +16,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -47,6 +48,11 @@ public class ProtectionListener implements Listener {
         pendingConfirmations.entrySet().removeIf(entry ->
                 entry.getKey().equals(deadPlayerUUID) || entry.getValue().equals(deadPlayerUUID)
         );
+    }
+
+    @EventHandler
+    public void onRespawn(PlayerRespawnEvent event) {
+        SpawnProtection.getDeathEffectsManager().applyDeathEffects(event.getPlayer());
     }
 
     @EventHandler
