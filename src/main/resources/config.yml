@@ -31,7 +31,7 @@ death-effects: # Gives players potion effects when they die (applied on respawn)
   effects:
     weakness:
       enabled: true
-      type: WEAKNESS # Any valid Bukkit PotionEffectType, e.g. WEAKNESS, SLOW, BLINDNESS, REGENERATION...
+      type: WEAKNESS # Any valid Bukkit PotionEffectType, e.g. WEAKNESS, SLOWNESS, BLINDNESS, REGENERATION...
       duration-seconds: 30
       amplifier: 0 # Effect level, 0 = level 1
       ambient: true # Whether the effect uses the translucent particle style
@@ -39,7 +39,7 @@ death-effects: # Gives players potion effects when they die (applied on respawn)
       icon: true # Whether the effect icon is shown in the inventory
     slowness:
       enabled: false
-      type: SLOW
+      type: SLOWNESS
       duration-seconds: 30
       amplifier: 1
       ambient: true
